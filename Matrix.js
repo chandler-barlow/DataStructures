@@ -18,11 +18,11 @@ module.exports = (function () {
       if (this.verifyMatrix(values)) {
         this._values = values;
         if (values[0] instanceof Array) {
-          this._m = values[0].length;
-          this._n = values.length;
-        } else {
           this._m = values.length;
-          this._n = this._m > 1 ? 1 : 0;
+          this._n = values[0].length;
+        } else {
+          this._m = this._n > 1 ? 1 : 0;
+          this._n = values.length;
         }
       } else {
         throw "Not a valid matrix, all rows must be the same length. Initial Matrix must also be of type Array";
@@ -31,15 +31,25 @@ module.exports = (function () {
       console.log(e);
     }
   }
-  Matrix.prototype.multiply = function (otherMatrix) {
-    if (otherMatrix instanceof Number) {
-      if (this._m < 1) {
-        return 0;
-      } else if (this._n === 1) {
-        this._values = this._values.map((e) => e * otherMatrix);
-      } else if (this._n > 1) {
+  Matrix.prototype.multiplyBy = function (otherMatrix) {
+    try {
+      if (typeof otherMatrix === "number") {
+        if (this._n < 1) {
+          return 0;
+        } else if (this._m === 1) {
+          console.log("ran");
+          this._values = this._values.map((e) => e * otherMatrix);
+        } else if (this._m > 1) {
+          this._values = this._values.map((e) => e.map((q) => q * otherMatrix));
+        }
+      } else if (otherMatrix instanceof Matrix) {
+        if (this._m != otherMatrix._n) {
+          throw "Row of  count must equal column count for matrix multiplication to be possible!";
+        }
+        let res = [];
       }
-    } else if (otherMatrix instanceof Matrix) {
+    } catch (e) {
+      console.log(e);
     }
   };
   return Matrix;
