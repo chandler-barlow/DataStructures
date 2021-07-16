@@ -47,6 +47,12 @@ module.exports = (function () {
           throw "Row of  count must equal column count for matrix multiplication to be possible!";
         }
         let res = [];
+        // OTHER X THIS -> RES
+        if (this._m > 1) {
+          for (var i = 0; i < this._m; i++) {
+            res.push([]);
+          }
+        }
       }
     } catch (e) {
       console.log(e);
