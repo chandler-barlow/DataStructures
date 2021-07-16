@@ -1,4 +1,4 @@
-const Heap = (function () {
+module.exports = (function () {
   function Heap(heapType) {
     if (heapType !== "max" && heapType !== "min") {
       console.log(
@@ -67,4 +67,3 @@ const Heap = (function () {
 
   return Heap;
 })();
-S;
