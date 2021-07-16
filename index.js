@@ -1,7 +1,9 @@
-const Matrix = require("./Matrix.js");
-const m = new Matrix([
-  [1, 1, 1, 1],
-  [1, 1, 1, 1],
+const Linear = require("./Linear.js");
+const Matrix = Linear.Matrix;
+const m1 = new Matrix([
+  [2, 2],
+  [2, 2],
 ]);
-m.multiplyBy(0.5);
-console.log(m);
+const m2 = new Matrix([1, 1]);
+const m3 = Linear.scale(m1, 10);
+console.log(m3, m1);
