@@ -78,21 +78,40 @@ const Matrix = (function () {
 // Returns a matrix of zeros in a given shape
 function zeros(m, n) {
   if (m > 1) {
-    return new Array(m).fill(Array(n).fill(0));
+    return new Matrix(new Array(m).fill(new Array(n).fill(0)));
   }
-  return new Array(n).fill(0);
+  return new Matrix(Array(n).fill(0));
 }
 
 // Multiply a matrix by a matrix
 function multiply(m1, m2) {
   // Build a result object
   let res = zeros(m1._m, m2._n);
+  //let res = [];
   try {
     // Are both inputs actually matrices?
     if (m1 instanceof Matrix && m2 instanceof Matrix) {
       // Is matrix multiplication actually possible with the given inputs?
       if (m1._n != m2._m) {
         throw "Column of matrix 1 count must equal row count for matrix 2 for multiplication to be possible!";
+      } else if (m1._n === 0) {
+        throw "Both matrices must contain data for multiplication to be possible";
+        // <--- THE MATRIX MULTIPLICATION ALGO BEGINS ---> //
+        // If the first matrix is just a regular array
+      } else if (m1._m === 1) {
+        for (var c = 0; c < m2._n; c++) {
+          for (var i = 0; i < m1._n; i++) {
+            res._values[c] += m1._values[i] * m2._values[i][c];
+          }
+        }
+      } else {
+        for (var r = 0; r < m1._m; r++) {
+          for (var c = 0; c < m2._n; c++) {
+            for (var i = 0; i < m1._n; i++) {
+              res._values[r][c] += m1._values[r][i] * m2._values[i][c];
+            }
+          }
+        }
       }
     } else {
       throw "Both arguments must be of type Matrix";
@@ -110,6 +129,7 @@ function scale(matrix, scalar) {
   res.scale(scalar);
   return res;
 }
+
 module.exports = {
   Matrix: Matrix,
   multiply: multiply,
