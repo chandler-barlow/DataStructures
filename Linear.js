@@ -35,6 +35,8 @@ const Matrix = (function () {
       // Verify the matrix
       if (this.verifyMatrix(values)) {
         this._values = values;
+        this._tcurrent = false;
+        this._T = [];
         // If the matrix is going to be multi dimensional
         if (values[0] instanceof Array) {
           this._n = values[0].length;
@@ -52,12 +54,47 @@ const Matrix = (function () {
       console.log(e);
     }
   }
-  Matrix.prototype.getAsArray = function () {
-    return this._values;
+  Matrix.prototype.get = function (m, n) {
+    try {
+      if (m >= 0 && n >= 0 && m < this._m && n < this._n) {
+        if (this._m > 1) {
+          return this._values[m][n];
+        } else {
+          return this._values[n];
+        }
+      } else {
+        throw "M or N not within bounds of matrix";
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  // UPDATE VALUE AT POSITION M:N //
+  Matrix.prototype.update = function (m, n, value) {
+    try {
+      if (m < this._m && m >= 0 && n < this._n && n >= 0) {
+        this._tcurrent = false;
+        if (this._m > 1) {
+          this._values[m][n] = value;
+        } else {
+          this._values[n] = value;
+        }
+      } else {
+        throw "Value to be updated must exist within the bounds of the matrix.";
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  // Return matrix values as an array
+  Matrix.prototype.asArray = function () {
+    return this._values.map((e) => [...e]);
   };
   Matrix.prototype.scale = function (scalar) {
     try {
       if (typeof scalar === "number") {
+        // THE MATRIX WILL BE CHANGED SO ALERT CACHE //
+        this._tcurrent = false;
         if (this._n < 1) {
           return 0;
         } else if (this._m === 1) {
@@ -72,15 +109,26 @@ const Matrix = (function () {
       console.log(e);
     }
   };
+  // THIS IS CACHED //
+  // _T is the field containing the last transpopse result
+  // _tcurrent is the field that will be set to false when the matrix changes in a way that makes the cache out of date
+  Matrix.prototype.T = function () {
+    if (this._tcurrent) {
+      return this._T;
+    } else {
+      this._T = [...this._values];
+    }
+  };
+  Matrix.prototype.transpose = function () {};
   return Matrix;
 })();
 
 // Returns a matrix of zeros in a given shape
 function zeros(m, n) {
   if (m > 1) {
-    return new Matrix(new Array(m).fill(new Array(n).fill(0)));
+    return new Matrix(new Array(m).fill(0).map(() => new Array(n).fill(0)));
   }
-  return new Matrix(Array(n).fill(0));
+  return new Matrix(new Array(n).fill(0));
 }
 
 // Multiply a matrix by a matrix
@@ -97,18 +145,12 @@ function multiply(m1, m2) {
       } else if (m1._n === 0) {
         throw "Both matrices must contain data for multiplication to be possible";
         // <--- THE MATRIX MULTIPLICATION ALGO BEGINS ---> //
-        // If the first matrix is just a regular array
-      } else if (m1._m === 1) {
-        for (var c = 0; c < m2._n; c++) {
-          for (var i = 0; i < m1._n; i++) {
-            res._values[c] += m1._values[i] * m2._values[i][c];
-          }
-        }
       } else {
         for (var r = 0; r < m1._m; r++) {
           for (var c = 0; c < m2._n; c++) {
             for (var i = 0; i < m1._n; i++) {
-              res._values[r][c] += m1._values[r][i] * m2._values[i][c];
+              console.log(res._values);
+              res.update(r, c, res.get(r, c) + m1.get(r, i) * m2.get(i, c));
             }
           }
         }
@@ -125,7 +167,7 @@ function multiply(m1, m2) {
 
 // Multiply a matrix by a scalar
 function scale(matrix, scalar) {
-  let res = new Matrix(matrix._values);
+  let res = new Matrix(matrix.asArray());
   res.scale(scalar);
   return res;
 }
