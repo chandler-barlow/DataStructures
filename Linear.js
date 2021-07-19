@@ -35,7 +35,6 @@ const Matrix = (function () {
       // Verify the matrix
       if (this.verifyMatrix(values)) {
         this._values = values;
-        this._tcurrent = false;
         this._T = [];
         // If the matrix is going to be multi dimensional
         if (values[0] instanceof Array) {
@@ -73,7 +72,6 @@ const Matrix = (function () {
   Matrix.prototype.update = function (m, n, value) {
     try {
       if (m < this._m && m >= 0 && n < this._n && n >= 0) {
-        this._tcurrent = false;
         if (this._m > 1) {
           this._values[m][n] = value;
         } else {
@@ -88,13 +86,14 @@ const Matrix = (function () {
   };
   // Return matrix values as an array
   Matrix.prototype.asArray = function () {
-    return this._values.map((e) => [...e]);
+    if (this._m > 1) {
+      return this._values.map((e) => [...e]);
+    }
+    return [...this._values];
   };
   Matrix.prototype.scale = function (scalar) {
     try {
       if (typeof scalar === "number") {
-        // THE MATRIX WILL BE CHANGED SO ALERT CACHE //
-        this._tcurrent = false;
         if (this._n < 1) {
           return 0;
         } else if (this._m === 1) {
@@ -109,14 +108,59 @@ const Matrix = (function () {
       console.log(e);
     }
   };
-  // THIS IS CACHED //
-  // _T is the field containing the last transpopse result
-  // _tcurrent is the field that will be set to false when the matrix changes in a way that makes the cache out of date
+  // Transpose //
   Matrix.prototype.T = function () {
-    if (this._tcurrent) {
-      return this._T;
+    let res;
+    if (this._n > 1) {
+      res = new Array(this._n).fill(0).map(() => new Array(this._m).fill(0));
     } else {
-      this._T = [...this._values];
+      res = new Array(this._m).fill(0);
+    }
+    for (var r = 0; r < this._m; r++) {
+      for (var c = 0; c < this._n; c++) {
+        if (this._n > 1) {
+          res[c][r] = this.get(r, c);
+        } else {
+          res[c] = this.get(r, c);
+        }
+      }
+    }
+    this._values = res;
+  };
+  // MULTIPLY BY //
+  Matrix.prototype.multiplyBy = function (otherMatrix) {
+    try {
+      if (otherMatrix instanceof Matrix) {
+        if (otherMatrix._n != this._m) {
+          throw "Argument Matrix rows must equal Matrix columns for multiplication to be possible!";
+        }
+        let res;
+        if (this._m > 1) {
+          res = new Array(this._m)
+            .fill(0)
+            .map(() => new Array(otherMatrix._n).fill(0));
+        } else {
+          res = new Array(otherMatrix._n).fill(0);
+        }
+        for (var r = 0; r < otherMatrix._m; r++) {
+          for (var c = 0; c < this._n; c++) {
+            for (var i = 0; i < otherMatrix._n; i++) {
+              res.update(
+                r,
+                c,
+                res.get(r, c) + otherMatrix.get(r, i) * this.get(i, c)
+              );
+            }
+          }
+        }
+        this._values = res;
+        this._m = this._m;
+        this._n = otherMatrix._n;
+      } else {
+        throw "Argument must be of type Matrix!";
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
   Matrix.prototype.transpose = function () {};
@@ -172,9 +216,17 @@ function scale(matrix, scalar) {
   return res;
 }
 
+// Transpose matrix //
+function transpose(matrix) {
+  let res = new Matrix(matrix.asArray());
+  res.T();
+  return res;
+}
+
 module.exports = {
   Matrix: Matrix,
   multiply: multiply,
   scale: scale,
   zeros: zeros,
+  transpose: transpose,
 };
