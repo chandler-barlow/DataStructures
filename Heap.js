@@ -10,7 +10,13 @@ const Heap = (function () {
     this._heapType = heapType;
     this._elements = [];
   }
-
+/**
+ * Swaps elements
+ * The first and second element get swapped.
+ * @param {number} indexOne - The index of the first element
+ * @param {number} indexTwo - The index of the second element
+ * @return {void}
+ */
   Heap.prototype._swap = function (indexOne, indexTwo) {
     let temp = this._elements[indexOne];
     this._elements[indexOne] = this._elements[indexTwo];
