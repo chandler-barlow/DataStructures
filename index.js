@@ -1,4 +1,4 @@
-const lin = require("./Linear.js");
+const lin = require("./src/Linear.js");
 const { Matrix } = lin;
 const m1 = new Matrix([
   [2, 2],
