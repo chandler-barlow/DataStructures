@@ -1,0 +1,19 @@
+{
+  "name": "datastructures",
+  "version": "1.0.0",
+  "description": "An implementation of data structures",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chandler-barlow/DataStructures.git"
+  },
+  "author": "Chandler Barlow",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chandler-barlow/DataStructures/issues"
+  },
+  "homepage": "https://github.com/chandler-barlow/DataStructures#readme"
+}
