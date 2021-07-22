@@ -1,5 +1,9 @@
 const Matrix = (function () {
-  // CONSTRUCTOR //
+  /**
+   * Matrix constructor
+   * @constructor
+   * @param {Array} values - initial value of the matrix
+   */
   function Matrix(values = []) {
     // Make sure that the incoming array can be turned into a valid Matrix //
     this.verifyMatrix = (values) => {
@@ -31,11 +35,9 @@ const Matrix = (function () {
       }
       return isValid;
     };
-    try {
       // Verify the matrix
       if (this.verifyMatrix(values)) {
         this._values = values;
-        this._T = [];
         // If the matrix is going to be multi dimensional
         if (values[0] instanceof Array) {
           this._n = values[0].length;
@@ -49,12 +51,8 @@ const Matrix = (function () {
       } else {
         throw "Not a valid matrix, all rows must be the same length. Initial Matrix must also be of type Array";
       }
-    } catch (e) {
-      console.log(e);
-    }
   }
   Matrix.prototype.get = function (m, n) {
-    try {
       if (m >= 0 && n >= 0 && m < this._m && n < this._n) {
         if (this._m > 1) {
           return this._values[m][n];
@@ -64,13 +62,9 @@ const Matrix = (function () {
       } else {
         throw "M or N not within bounds of matrix";
       }
-    } catch (e) {
-      console.log(e);
-    }
   };
   // UPDATE VALUE AT POSITION M:N //
   Matrix.prototype.update = function (m, n, value) {
-    try {
       if (m < this._m && m >= 0 && n < this._n && n >= 0) {
         if (this._m > 1) {
           this._values[m][n] = value;
@@ -80,9 +74,6 @@ const Matrix = (function () {
       } else {
         throw "Value to be updated must exist within the bounds of the matrix.";
       }
-    } catch (e) {
-      console.log(e);
-    }
   };
   // Return matrix values as an array
   Matrix.prototype.asArray = function () {
@@ -92,7 +83,6 @@ const Matrix = (function () {
     return [...this._values];
   };
   Matrix.prototype.scale = function (scalar) {
-    try {
       if (typeof scalar === "number") {
         if (this._n < 1) {
           return 0;
@@ -104,9 +94,6 @@ const Matrix = (function () {
       } else {
         throw "type of scalar must be number";
       }
-    } catch (e) {
-      console.log(e);
-    }
   };
   // Transpose //
   Matrix.prototype.T = function () {
@@ -121,15 +108,17 @@ const Matrix = (function () {
         if (this._n > 1) {
           res[c][r] = this.get(r, c);
         } else {
-          res[c] = this.get(r, c);
+          res[r] = this.get(r, c);
         }
       }
     }
+    let tmp = this._m;
+    this._m = this._n;
+    this._n = tmp;
     this._values = res;
   };
   // MULTIPLY BY //
   Matrix.prototype.multiplyBy = function (otherMatrix) {
-    try {
       if (otherMatrix instanceof Matrix) {
         if (otherMatrix._n != this._m) {
           throw "Argument Matrix rows must equal Matrix columns for multiplication to be possible!";
@@ -159,20 +148,18 @@ const Matrix = (function () {
       } else {
         throw "Argument must be of type Matrix!";
       }
-    } catch (e) {
-      console.log(e);
-    }
   };
-  Matrix.prototype.transpose = function () {};
   return Matrix;
 })();
 
 // Returns a matrix of zeros in a given shape
 function zeros(m, n) {
-  if (m > 1) {
-    return new Matrix(new Array(m).fill(0).map(() => new Array(n).fill(0)));
-  }
-  return new Matrix(new Array(n).fill(0));
+    if (m > 1 && n > 0) {
+      return new Matrix(new Array(m).fill(0).map(() => new Array(n).fill(0)));
+    } else if (m > 0 && n > 0){
+      return new Matrix(new Array(n).fill(0));
+    }
+    throw new Error("Invalid arguments, Matrix must have atleast one row and one column");
 }
 
 // Multiply a matrix by a matrix
