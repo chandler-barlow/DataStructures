@@ -1,3 +1,9 @@
+/**
+ * Finds the length of the longest common sub sequence of characters in two strings
+ * @param {string} s1 - The first string
+ * @param {string} s2 - The string to be compared to the first string
+ * @returns {number} - The length of the longest comomon sub sequence
+ */
 function LCS(s1, s2) {
   const max = (a, b) => (a > b ? a : b);
   let cache = new Array(s1.length + 1)
